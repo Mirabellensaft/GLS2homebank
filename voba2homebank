@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+
+import csv
+
+fieldnames_in = [
+        'buchungstag',
+        'valuta',
+        'auftraggeber',
+        'empfänger',
+        'konto',
+        'iban',
+        'blz',
+        'bic',
+        'vorgang',
+        'kundenreferenz',
+        'währung',
+        'umsatz',
+        'habensoll'
+]
+fieldnames_out = [
+        'date',
+        'payment',  # "Zahlung" in HomeBank
+        'info',
+        'payee',
+        'memo',
+        'amount',
+        'category',
+        'tags'
+]
+
+with open('Umsaetze_DE38664900000004328108_2018.02.09.csv', 'r', encoding='iso-8859-1') as csvfile, open('homebank.csv', 'w') as homebank_csvfile:
+    reader = csv.DictReader(csvfile, fieldnames=fieldnames_in, delimiter=';', quotechar='"')
+    writer = csv.DictWriter(homebank_csvfile, fieldnames=fieldnames_out, delimiter=';', quotechar='"')
+    for row in reader:
+        outrow = {
+                'date':    row['buchungstag'].replace('.', '-'),
+                'payment': 0,  # FIXME
+                'info':    ' '.join(row['vorgang'].split('\n')) if row['vorgang'] is not None else '',
+                'payee':   row['empfänger'],
+                'amount':  '-' + row['umsatz'] if row['habensoll'] == 'S' else row['umsatz'],
+        }
+        writer.writerow(outrow)
+
