@@ -28,20 +28,34 @@ fieldnames_out = [
         'tags'
 ]
 
-parser = argparse.ArgumentParser(description='convert voba cvs file for homebank')
+parser = argparse.ArgumentParser(
+        description='convert voba cvs file for homebank')
 parser.add_argument('voba_csv')
 args = parser.parse_args()
 
-with open(args.voba_csv, 'r', encoding='iso-8859-1') as csvfile, open('homebank.csv', 'w') as homebank_csvfile:
-    reader = csv.DictReader(csvfile, fieldnames=fieldnames_in, delimiter=';', quotechar='"')
-    writer = csv.DictWriter(homebank_csvfile, fieldnames=fieldnames_out, delimiter=';', quotechar='"')
+with open(args.voba_csv, 'r', encoding='iso-8859-1') as csvfile, \
+         open('homebank.csv', 'w') as homebank_csvfile:
+    reader = csv.DictReader(csvfile, fieldnames=fieldnames_in,
+                            delimiter=';', quotechar='"')
+    writer = csv.DictWriter(homebank_csvfile, fieldnames=fieldnames_out,
+                            delimiter=';', quotechar='"')
     for row in reader:
+
+        date = row['buchungstag'].replace('.', '-')
+        if row['vorgang'] is not None:
+            info = ' '.join(row['vorgang'].split('\n'))
+        else:
+            info = ''
+        if row['habensoll'] == 'S':
+            amount = '-' + row['umsatz']
+        else:
+            amount = row['umsatz']
+
         outrow = {
-                'date':    row['buchungstag'].replace('.', '-'),
+                'date':    date,
                 'payment': 0,  # FIXME
-                'info':    ' '.join(row['vorgang'].split('\n')) if row['vorgang'] is not None else '',
+                'info':    info,
                 'payee':   row['empfänger'],
-                'amount':  '-' + row['umsatz'] if row['habensoll'] == 'S' else row['umsatz'],
+                'amount':  amount,
         }
         writer.writerow(outrow)
-
