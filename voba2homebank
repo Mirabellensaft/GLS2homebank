@@ -33,8 +33,11 @@ parser = argparse.ArgumentParser(
 parser.add_argument('voba_csv')
 args = parser.parse_args()
 
-with open(args.voba_csv, 'r', encoding='iso-8859-1') as csvfile, \
-         open('homebank.csv', 'w') as homebank_csvfile:
+in_csv_filename = args.voba_csv
+out_csv_filename = in_csv_filename.replace('.csv', '.homebank.csv')
+
+with open(in_csv_filename, 'r', encoding='iso-8859-1') as csvfile, \
+         open(out_csv_filename, 'w') as homebank_csvfile:
     reader = csv.DictReader(csvfile, fieldnames=fieldnames_in,
                             delimiter=';', quotechar='"')
     writer = csv.DictWriter(homebank_csvfile, fieldnames=fieldnames_out,
