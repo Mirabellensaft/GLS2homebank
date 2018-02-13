@@ -43,9 +43,9 @@ with open(args.voba_csv, 'r', encoding='iso-8859-1') as csvfile, \
 
         date = row['buchungstag'].replace('.', '-')
         if row['vorgang'] is not None:
-            info = ' '.join(row['vorgang'].split('\n'))
+            memo = ' '.join(row['vorgang'].split('\n'))
         else:
-            info = ''
+            memo = ''
         if row['habensoll'] == 'S':
             amount = '-' + row['umsatz']
         else:
@@ -54,7 +54,7 @@ with open(args.voba_csv, 'r', encoding='iso-8859-1') as csvfile, \
         outrow = {
                 'date':    date,
                 'payment': 0,  # FIXME
-                'info':    info,
+                'memo':    memo,
                 'payee':   row['empfänger'],
                 'amount':  amount,
         }
